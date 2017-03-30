@@ -1,7 +1,35 @@
-from gpx import GpxParser
-from filters import regular_intervals
+import requests
+import time
+import os
 
-with open('SIR_Permanent_1845__Flat_Snohomish-Edison_200K.gpx') as f:
-    parser = GpxParser(f)
-    for p in regular_intervals(parser.points_with_attributes(), 10.0):
-        print(p)
+place_search_url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
+place_detail_url = 'https://maps.googleapis.com/maps/api/place/details/json'
+
+def place_search(lat, lng, keyword):
+
+    place_params = {
+        'key': os.environ['GOOGLE_PLACES_KEY'],
+        'location': '{0}, {1}'.format(lat, lng),
+        'radius':5000,
+        'keyword': keyword
+    }
+
+    while True:
+        r = requests.get(place_search_url, params=place_params)
+        places = r.json()
+        for p in places['results']:
+            yield (p['name'], p['place_id'])
+        if 'next_page_token' in places:
+            place_params['pagetoken'] = places['next_page_token']
+            time.sleep(20)
+        else:
+            break
+
+def place_detail(id):
+    place_params = {
+        'key': os.environ['GOOGLE_PLACES_KEY'],
+        'placeid': id
+    }
+    
+    r = requests.get(place_detail_url, params=place_params)
+    return r.json()['result']
