@@ -26,7 +26,7 @@ class GpxParser():
             if first:
                 last_p = p_tuple
                 first = False
-            p_distance = distance(last_p, p_tuple).miles
+            p_distance = distance(last_p, p_tuple).km
             last_p = p_tuple
             p['distance'] = p_distance
             cum_distance += p_distance
