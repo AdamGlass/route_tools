@@ -1,9 +1,17 @@
 import requests
 import time
 import os
+import sys
+
+from collections import namedtuple
+from tqdm import tqdm
+
+from filters import regular_intervals
 
 place_search_url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
 place_detail_url = 'https://maps.googleapis.com/maps/api/place/details/json'
+
+PlaceData = namedtuple('placedata', 'name address opening_hours_text opening_hours, types')
 
 def place_search_core(lat, lng, radius, type):
     place_params = {
@@ -35,3 +43,21 @@ def place_detail(id):
     
     r = requests.get(place_detail_url, params=place_params)
     return r.json()['result']
+
+
+def place_route_data(parser):
+    places = []
+    for p in regular_intervals(parser.points_with_attributes(), 2.0):
+        print(p, file=sys.stderr)
+        new_places = list(place_search(p['lat'], p['lon'], 2.0, ['bicycle_store', 'bakery', 'cafe', 'convenience_store', 'grocery_or_supermarket', 'food']))
+        places.extend(new_places)
+
+    unique_places = set(places)
+    for place in unique_places:
+        p = place_detail(place)
+        hours = p.get('opening_hours')
+        if hours:
+            hours = p['opening_hours'].get('weekday_text')
+        else:
+            hours = 'UNKNOWN'
+        yield PlaceData(p['name'], p['formatted_address'], hours, p.get('periods'), p['types'])
