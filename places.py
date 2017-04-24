@@ -1,10 +1,9 @@
-import requests
 import time
 import os
 import sys
-
 from collections import namedtuple
-from tqdm import tqdm
+
+import requests
 
 from filters import regular_intervals
 

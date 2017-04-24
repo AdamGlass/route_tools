@@ -1,9 +1,9 @@
 import argparse
 
+import requests
+
 from gpx import GpxParser
 from places import place_route_data
-
-import requests
 
 parser = argparse.ArgumentParser(description='route tool')
 parser.add_argument('route', type=str)

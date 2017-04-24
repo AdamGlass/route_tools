@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as ET
+
 from geopy.distance import great_circle as distance
 
 ns = { 'gpx1': 'http://www.topografix.com/GPX/1/0' }
