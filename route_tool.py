@@ -5,7 +5,7 @@ import requests
 
 from gpx import GpxParser
 from places import place_route_data
-from weather import weather_route_data
+from weather import weather_route_now
 
 parser = argparse.ArgumentParser(description='route tool')
 parser.add_argument('route', type=str)
@@ -31,5 +31,5 @@ if args.places:
         print('{0}, {1}, {2}'.format(d.name, d.address, d.opening_hours_text))
 
 if args.weather:
-    data = weather_route_data(gpx)
+    data = weather_route_now(gpx)
     print(data)

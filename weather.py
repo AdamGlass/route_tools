@@ -1,5 +1,6 @@
 import os
 from collections import namedtuple
+import time
 
 import requests
 
@@ -39,3 +40,15 @@ def weather_route_data (parser):
         forecast = forecast_request(key, p['lat'], p['lon'])
         weather.append(list(forecast_to_sequence(forecast)))
     return weather
+
+def forecast_at_time(forecast, t):
+    f = min(forecast, key=lambda x: abs(x.time - t))
+    return f
+
+def weather_route_now(parser):
+    now = int(time.time())
+    weather = weather_route_data(parser);
+    for w in weather:
+        f = forecast_at_time(w, now)
+        print(f)
+    
