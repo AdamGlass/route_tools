@@ -25,6 +25,7 @@ def get_static_map(image, overlays):
 
 def image_route_compare(intended_gpx, ridden_gpx, image):
 
+    # N.B. mapbox has a 8k URL limitation.  increase interval until we fit
     interval = 1
     while True:
         intended_points = [(p['lat'],p['lon']) for p in regular_intervals(intended_gpx.points_with_attributes(), interval)]
@@ -34,13 +35,12 @@ def image_route_compare(intended_gpx, ridden_gpx, image):
 
         intended = quote('path-3+ff0000-0.5({0})'.format(intended_polyline))
         ridden = quote('path-3+0000ff-0.5({0})'.format(ridden_polyline))
-        if len(intended) + len(ridden) > 7000:
+        if len(intended) + len(ridden) > 7500:
             interval += 1
             continue
         else:
             break
 
-    print(interval)
     start = quote('pin-l-bicycle+00ff00({0},{1})'.format(ridden_points[0][1], ridden_points[0][0]))
     end = quote('pin-s-bicycle+ff0000({0},{1})'.format(ridden_points[0][1], ridden_points[0][0]))
     get_static_map(image, [start, end, intended, ridden])
