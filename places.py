@@ -47,7 +47,6 @@ def place_detail(id):
 def place_route_data(parser, interval, offroute):
     places = []
     for p in regular_intervals(parser.points_with_attributes(), interval):
-        print(p, file=sys.stderr)
         new_places = list(place_search(p['lat'], p['lon'], offroute, ['bicycle_store', 'bakery', 'cafe', 'convenience_store', 'grocery_or_supermarket', 'food', 'campground', 'lodging', 'gas_station']))
         places.extend(new_places)
 

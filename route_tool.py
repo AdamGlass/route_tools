@@ -9,6 +9,7 @@ from weather import weather_route_now
 from satcover import satcover_route
 from output import simple_output, geojson_output
 from image import image_route, image_route_compare
+from stats import stats_route
 
 
 def route_data(s):
@@ -28,6 +29,7 @@ parser.add_argument('--weather', action='store_true')
 parser.add_argument('--satcover', action='store_true')
 parser.add_argument('--image', type=str)
 parser.add_argument('--image-compare', nargs=2, type=str, metavar=('OTHER-ROUTE', 'IMAGE'))
+parser.add_argument('--stats', action='store_true')
 parser.add_argument('--output', type=str, default='simple')
 
 args = parser.parse_args()
@@ -52,6 +54,9 @@ if args.image:
 
 if args.image_compare:
     image_route_compare(gpx, GpxParser(route_data(args.image_compare[0])), args.image_compare[1])
+
+if args.stats:
+    stats_route(gpx)
 
 if args.output == 'simple':
     simple_output(gpx, place_data, weather_data)

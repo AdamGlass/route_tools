@@ -1,6 +1,6 @@
-from lxml import etree as ET
 from io import StringIO
 
+from lxml import etree as ET
 from geopy.distance import great_circle as distance
 
 ns = { 'gpx1': 'http://www.topografix.com/GPX/1/0',
@@ -17,10 +17,14 @@ class GpxParser():
 
     def points(self):
         for t in self.root.findall('./trk/trkseg/trkpt', self.root.nsmap):
-            yield {
-                'lat': float(t.attrib['lat']),
-                'lon': float(t.attrib['lon'])
-            }
+            proto = {}
+            proto['lat'] = float(t.attrib['lat'])
+            proto['lon'] = float(t.attrib['lon'])
+
+            for x in t.findall('./time', self.root.nsmap):
+                proto['time'] = x.text
+
+            yield proto
 
     def points_with_attributes(self):
         first = True
