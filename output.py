@@ -1,13 +1,11 @@
 from geojson import LineString, Feature, FeatureCollection, Point
 import geojson
 
-def simple_output(parser, place_data, weather_data):
+def simple_output(parser, place_data):
     for d in place_data:
         print('{0}, {1}, {2}'.format(d.name, d.address, d.opening_hours_text))
-    if len(weather_data) > 0:
-        print(weather_data)
 
-def geojson_output(parser, place_data, weather_data):
+def geojson_output(parser, place_data):
     features = []
     route = LineString(list(map(lambda p: (p['lon'], p['lat']), parser.points())))
     route_feature = Feature(geometry=route)

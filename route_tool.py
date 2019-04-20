@@ -21,15 +21,16 @@ def route_data(s):
         return open(s, "rb")
 
 parser = argparse.ArgumentParser(description='route tool')
+group = parser.add_mutually_exclusive_group()
+group.add_argument('--places', action='store_true')
+group.add_argument('--weather', action='store_true')
+group.add_argument('--satcover', action='store_true')
+group.add_argument('--image', type=str)
+group.add_argument('--stats', action='store_true')
+group.add_argument('--image-compare', nargs=2, type=str, metavar=('OTHER-ROUTE', 'IMAGE'))
 parser.add_argument('route', type=str)
-parser.add_argument('--places', action='store_true')
 parser.add_argument('--place_interval', type=float, default=2.0)
 parser.add_argument('--place_offroute', type=float, default=2.0)
-parser.add_argument('--weather', action='store_true')
-parser.add_argument('--satcover', action='store_true')
-parser.add_argument('--image', type=str)
-parser.add_argument('--image-compare', nargs=2, type=str, metavar=('OTHER-ROUTE', 'IMAGE'))
-parser.add_argument('--stats', action='store_true')
 parser.add_argument('--output', type=str, default='simple')
 
 args = parser.parse_args()
@@ -42,9 +43,14 @@ weather_data = place_data = satcover_data = []
 
 if args.places:
     place_data = place_route_data(gpx, args.place_interval, args.place_offroute)
+    if args.output == 'simple':
+        simple_output(gpx, place_data)
+    else:
+        geojson_output(gpx, place_data)
 
 if args.weather:
     weather_data = weather_route_now(gpx)
+    print(weather_data)
 
 if args.satcover:
     satcover_data = satcover_route(gpx)
@@ -57,8 +63,3 @@ if args.image_compare:
 
 if args.stats:
     stats_route(gpx)
-
-if args.output == 'simple':
-    simple_output(gpx, place_data, weather_data)
-elif args.output == 'geojson':
-    geojson_output(gpx, place_data, weather_data)
