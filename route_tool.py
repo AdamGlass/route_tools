@@ -9,7 +9,7 @@ from weather import weather_route_now
 from satcover import satcover_route
 from output import simple_output, geojson_output
 from image import image_route, image_route_compare
-from stats import stats_route
+from stats import stats_route, stats_report
 from mapmatch import mapmatch_route
 
 def route_data(s):
@@ -66,4 +66,5 @@ if args.mapmatch:
     mapmatch_route(gpx)
 
 if args.stats:
-    stats_route(gpx)
+    data = stats_route(gpx)
+    stats_report(data)

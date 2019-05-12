@@ -1,4 +1,14 @@
-from flask import escape
+from flask import escape, jsonify, abort
+
+import requests
+
+from gpx import GpxParser
+from stats import stats_route
+
+def get_file(url):
+    r = requests.get(url, stream=True)
+    r.raise_for_status()
+    return r.content
 
 def route_tools(request):
     """HTTP Cloud Function.
@@ -11,12 +21,33 @@ def route_tools(request):
         <http://flask.pocoo.org/docs/1.0/api/#flask.Flask.make_response>.
     """
     request_json = request.get_json(silent=True)
-    request_args = request.args
 
-    if request_json and 'name' in request_json:
-        name = request_json['name']
-    elif request_args and 'name' in request_args:
-        name = request_args['name']
-    else:
-        name = 'World'
-    return 'Hello {}!'.format(escape(name))
+    if not request_json:
+        abort(500)
+
+    if request_json['operation'] == 'epp':
+        route_gpx = request_json['route_gpx']
+        rider_gpx = request_json['rider_gpx']
+
+        route_gpx_file = get_file(route_gpx)
+        rider_gpx_file = get_file(rider_gpx)
+
+        route_gpx_parser = GpxParser(route_gpx_file)
+        rider_gpx_parser = GpxParser(rider_gpx_file)
+
+        stats = {
+            'route_gpx_stats' : stats_route(route_gpx_parser),
+            'rider_gpx_stats' : stats_route(rider_gpx_parser)
+        }
+        return jsonify(stats)
+    abort(500)
+
+if __name__ == "__main__":
+    from flask import Flask, request
+    app = Flask(__name__)
+
+    @app.route('/')
+    def index():
+        return route_tools(request)
+
+    app.run('127.0.0.1', 8000, debug=True)

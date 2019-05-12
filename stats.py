@@ -24,10 +24,23 @@ def stats_route(gpx):
 
         duration = end_time - start_time
 
-    print('Points   : {0}'.format(point_count))
-    print('Distance : {0:.3f}'.format(distance))
-    print('Start    : {0}'.format(start_time))
-    print('End      : {0}'.format(end_time))
+    proto = {
+        'points': point_count,
+        'distance': distance,
+    }
+
+    if start_time:
+        proto['start'] = start_time,
+
+    if end_time:
+        proto['end'] =  end_time
+
     if start_time and end_time:
-        print('Duration : {0}'.format(duration))
-        print('Moving   : {0}'.format(moving_time))
+        proto['duration'] = duration
+        proto['moving_time'] = moving_time
+
+    return proto
+
+def stats_report(stats):
+    for k,v in stats.items():
+        print('{0} : {1}'.format(k,v))
