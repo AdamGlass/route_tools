@@ -1,9 +1,11 @@
-from flask import escape, jsonify, abort
+from base64 import b64encode
 
 import requests
+from flask import escape, jsonify, abort
 
 from gpx import GpxParser
 from stats import stats_route
+from image import image_route_compare
 
 def get_file(url):
     r = requests.get(url, stream=True)
@@ -35,9 +37,16 @@ def route_tools(request):
         route_gpx_parser = GpxParser(route_gpx_file)
         rider_gpx_parser = GpxParser(rider_gpx_file)
 
+        route_gpx_stats = stats_route(route_gpx_parser)
+        rider_gpx_stats = stats_route(rider_gpx_parser)
+
+        image = image_route_compare(route_gpx_parser, rider_gpx_parser)
+        image_encoded = b64encode(image).decode('ascii')
+
         stats = {
-            'route_gpx_stats' : stats_route(route_gpx_parser),
-            'rider_gpx_stats' : stats_route(rider_gpx_parser)
+            'route_gpx_stats' : route_gpx_stats,
+            'rider_gpx_stats' : rider_gpx_stats,
+            'comparison_image': image_encoded
         }
         return jsonify(stats)
     abort(500)

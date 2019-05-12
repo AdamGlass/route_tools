@@ -2,28 +2,27 @@ import os
 import requests
 from urllib.parse import quote
 
-
 import polyline
 
 from filters import regular_intervals
 
 mapbox_url = 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/{1}/auto/600x600?access_token={0}'
 
-
-def get_static_map(image, overlays):
+def get_static_map(overlays):
 
     quoted_overlays = ','.join(overlays)
     url = mapbox_url.format(os.environ['MAPBOX_TOKEN'], quoted_overlays)
     r = requests.get(url)
     if r.status_code == 200:
-        with open(image, 'wb') as f:
-            f.write(r.content)
+        return r.content
     else:
-        print(r.text)
-    print(r)
+        return None
 
+def image_save(image, file):
+    with open(file, 'wb') as f:
+        f.write(image)
 
-def image_route_compare(intended_gpx, ridden_gpx, image):
+def image_route_compare(intended_gpx, ridden_gpx):
 
     # N.B. mapbox has a 8k URL limitation.  increase interval until we fit
     interval = 1
@@ -43,7 +42,7 @@ def image_route_compare(intended_gpx, ridden_gpx, image):
 
     start = quote('pin-l-bicycle+00ff00({0},{1})'.format(ridden_points[0][1], ridden_points[0][0]))
     end = quote('pin-s-bicycle+ff0000({0},{1})'.format(ridden_points[0][1], ridden_points[0][0]))
-    get_static_map(image, [start, end, intended, ridden])
+    return get_static_map([start, end, intended, ridden])
 
 def image_route(gpx, image):
 
@@ -53,4 +52,4 @@ def image_route(gpx, image):
     start = quote('pin-l-bicycle+00ff00({0},{1})'.format(points[0][1], points[0][0]))
     end = quote('pin-s-bicycle+ff0000({0},{1})'.format(points[0][1], points[0][0]))
     path = quote('path-3+0000ff-0.5({0})'.format(encoded_polyline))
-    get_static_map(image, [start, end, path])
+    return get_static_map([start, end, path])

@@ -8,7 +8,7 @@ from places import place_route_data
 from weather import weather_route_now
 from satcover import satcover_route
 from output import simple_output, geojson_output
-from image import image_route, image_route_compare
+from image import image_route, image_route_compare, image_save
 from stats import stats_route, stats_report
 from mapmatch import mapmatch_route
 
@@ -58,9 +58,11 @@ if args.satcover:
 
 if args.image:
     image = image_route(gpx, args.image)
+    image_save(image, args.image)
 
 if args.image_compare:
-    image_route_compare(gpx, GpxParser(route_data(args.image_compare[0])), args.image_compare[1])
+    image = image_route_compare(gpx, GpxParser(route_data(args.image_compare[0])), args.image_compare[1])
+    image_save(image, args.image_compare[1])
 
 if args.mapmatch:
     mapmatch_route(gpx)
