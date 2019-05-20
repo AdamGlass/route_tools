@@ -36,8 +36,8 @@ def stats_route(gpx):
         proto['end'] =  end_time
 
     if start_time and end_time:
-        proto['duration'] = duration
-        proto['moving_time'] = moving_time
+        proto['duration'] = duration.total_seconds()
+        proto['moving_time'] = moving_time.total_seconds()
 
     return proto
 
