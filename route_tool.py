@@ -16,7 +16,7 @@ def route_data(s):
     if s.startswith('http'):
         r = requests.get(s, stream=True)
         r.raise_for_status()
-        return r.text
+        return r.content
     else:
         return open(s, "rb")
 
