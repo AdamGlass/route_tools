@@ -1,7 +1,12 @@
+import os
 from base64 import b64encode
+from datetime import timedelta
+import uuid
 
 import requests
 from flask import escape, jsonify, abort
+
+from google.cloud import storage
 
 from gpx import GpxParser
 from stats import stats_route
@@ -40,13 +45,21 @@ def route_tools(request):
         route_gpx_stats = stats_route(route_gpx_parser)
         rider_gpx_stats = stats_route(rider_gpx_parser)
 
+        gcs_client = storage.Client()
+        bucket_name = os.environ['GCS_BUCKET']
+        bucket = gcs_client.get_bucket(bucket_name)
+        name = uuid.uuid4().hex + '.png'
+        blob = bucket.blob(name)
+
         image = image_route_compare(route_gpx_parser, rider_gpx_parser)
-        image_encoded = b64encode(image).decode('ascii')
+        blob.upload_from_string(image)
+        blob.make_public()
+        url = blob.public_url
 
         stats = {
             'route_gpx_stats' : route_gpx_stats,
             'rider_gpx_stats' : rider_gpx_stats,
-            'comparison_image': image_encoded
+            'comparison_image': url
         }
         return jsonify(stats)
     abort(500)
