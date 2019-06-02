@@ -11,11 +11,25 @@ from google.cloud import storage
 from gpx import GpxParser
 from stats import stats_route
 from image import image_route_compare
+from similarity import similarity
 
 def get_file(url):
     r = requests.get(url, stream=True)
     r.raise_for_status()
     return r.content
+
+def get_comparison_image_url(route, rider):
+    gcs_client = storage.Client()
+    bucket_name = os.environ['GCS_BUCKET']
+    bucket = gcs_client.get_bucket(bucket_name)
+    name = uuid.uuid4().hex + '.png'
+    blob = bucket.blob(name)
+
+    image = image_route_compare(route, rider)
+    blob.upload_from_string(image)
+    blob.make_public()
+    url = blob.public_url
+    return url
 
 def route_tools(request):
     """HTTP Cloud Function.
@@ -45,21 +59,14 @@ def route_tools(request):
         route_gpx_stats = stats_route(route_gpx_parser)
         rider_gpx_stats = stats_route(rider_gpx_parser)
 
-        gcs_client = storage.Client()
-        bucket_name = os.environ['GCS_BUCKET']
-        bucket = gcs_client.get_bucket(bucket_name)
-        name = uuid.uuid4().hex + '.png'
-        blob = bucket.blob(name)
-
-        image = image_route_compare(route_gpx_parser, rider_gpx_parser)
-        blob.upload_from_string(image)
-        blob.make_public()
-        url = blob.public_url
+        url = get_comparison_image_url(route_gpx_parser, rider_gpx_parser)
+        sim = similarity(route_gpx_parser, rider_gpx_parser)
 
         stats = {
             'route_gpx_stats' : route_gpx_stats,
             'rider_gpx_stats' : rider_gpx_stats,
-            'comparison_image': url
+            'comparison_image': url,
+            'similarity': sim['derivative']
         }
         return jsonify(stats)
     abort(500)

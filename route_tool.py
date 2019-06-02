@@ -9,6 +9,7 @@ from weather import weather_route_now
 from satcover import satcover_route
 from output import simple_output, geojson_output
 from image import image_route, image_route_compare, image_save
+from similarity import similarity
 from stats import stats_route, stats_report
 from mapmatch import mapmatch_route
 
@@ -28,6 +29,7 @@ group.add_argument('--satcover', action='store_true')
 group.add_argument('--image', type=str)
 group.add_argument('--stats', action='store_true')
 group.add_argument('--image-compare', nargs=2, type=str, metavar=('OTHER-ROUTE', 'IMAGE'))
+group.add_argument('--similarity', type=str, metavar=('OTHER-ROUTE'))
 group.add_argument('--mapmatch', action='store_true')
 parser.add_argument('route', type=str)
 parser.add_argument('--place_interval', type=float, default=2.0)
@@ -63,6 +65,10 @@ if args.image:
 if args.image_compare:
     image = image_route_compare(gpx, GpxParser(route_data(args.image_compare[0])), args.image_compare[1])
     image_save(image, args.image_compare[1])
+
+if args.similarity:
+    data = similarity(gpx, GpxParser(route_data(args.similarity)))
+    print(data)
 
 if args.mapmatch:
     mapmatch_route(gpx)
