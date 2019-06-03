@@ -66,7 +66,7 @@ def route_tools(request):
             'route_gpx_stats' : route_gpx_stats,
             'rider_gpx_stats' : rider_gpx_stats,
             'comparison_image': url,
-            'similarity': sim['derivative']
+            'similarity': sim
         }
         return jsonify(stats)
     abort(500)
