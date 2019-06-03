@@ -1,3 +1,5 @@
+from scipy.spatial.distance import directed_hausdorff
+import numpy as np
 
 def similarity(intended_gpx, ridden_gpx):
     intended_points = [(p['lat'],p['lon']) for p in intended_gpx.points()]
@@ -7,4 +9,11 @@ def similarity(intended_gpx, ridden_gpx):
 
     proto = {}
     proto['derivative'] = 1 - len(ridden_set - intended_set)/len(ridden_set)
+
+
+    i = np.array(intended_points)
+    r = np.array(ridden_points)
+
+    x = directed_hausdorff(i, r)
+    proto['hausdorff'] = x[0]
     return proto
