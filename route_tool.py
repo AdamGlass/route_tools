@@ -59,11 +59,11 @@ if args.satcover:
     satcover_data = satcover_route(gpx)
 
 if args.image:
-    image = image_route(gpx, args.image)
+    image = image_route(gpx)
     image_save(image, args.image)
 
 if args.image_compare:
-    image = image_route_compare(gpx, GpxParser(route_data(args.image_compare[0])), args.image_compare[1])
+    image = image_route_compare(gpx, GpxParser(route_data(args.image_compare[0])))
     image_save(image, args.image_compare[1])
 
 if args.similarity:

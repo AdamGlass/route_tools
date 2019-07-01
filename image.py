@@ -44,7 +44,7 @@ def image_route_compare(intended_gpx, ridden_gpx):
     end = quote('pin-s-bicycle+ff0000({0},{1})'.format(ridden_points[0][1], ridden_points[0][0]))
     return get_static_map([start, end, intended, ridden])
 
-def image_route(gpx, image):
+def image_route(gpx):
 
     points = [(p['lat'],p['lon']) for p in regular_intervals(gpx.points_with_attributes(), 1)]
 
